@@ -176,6 +176,12 @@ public class GenerateMojo extends AbstractMojo {
 	@Parameter
 	private String path;
 
+	/**
+	 * If true skips the mapping of tags to commits.
+	 */
+	@Parameter(defaultValue = "false")
+	private boolean skipTags;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("Generating gitlog in " + outputDirectory.getAbsolutePath()
@@ -203,7 +209,7 @@ public class GenerateMojo extends AbstractMojo {
 			commitFilters.add(new RegexpFilter(excludeCommitsPattern));
 		}
 
-		Generator generator = new Generator(renderers, commitFilters, getLog());
+		Generator generator = new Generator(renderers, commitFilters, skipTags, getLog());
 		Repository repository;
 
 		try {

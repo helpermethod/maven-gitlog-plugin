@@ -22,12 +22,18 @@ class Generator {
 	private RevWalk walk;
 	private Map<String, List<RevTag>> commitIDToTagsMap;
 	private final List<CommitFilter> commitFilters;
+	private final boolean skipTags;
 	private final Log log;
 
-	public Generator(List<ChangeLogRenderer> renderers, List<CommitFilter> commitFilters, Log log) {
+	public Generator(List<ChangeLogRenderer> renderers, List<CommitFilter> commitFilters, boolean skipTags, Log log) {
 		this.renderers = renderers;
 		this.commitFilters = (commitFilters == null) ? new ArrayList<CommitFilter>() : commitFilters;
+		this.skipTags = skipTags;
 		this.log = log;
+	}
+
+	public Generator(List<ChangeLogRenderer> renderers, List<CommitFilter> commitFilters, Log log) {
+		this(renderers, commitFilters, false, log);
 	}
 
 	public Repository openRepository() throws IOException, NoGitRepositoryException {
@@ -49,7 +55,7 @@ class Generator {
 		log.debug("Opened " + repository + ". About to load the commits.");
 		walk = createWalk(repository);
 		log.debug("Loaded commits. about to load the tags.");
-		commitIDToTagsMap = createCommitIDToTagsMap(repository, walk);
+		commitIDToTagsMap = skipTags ? new HashMap<String, List<RevTag>>() : createCommitIDToTagsMap(repository, walk);
 		log.debug("Loaded tag map: " + commitIDToTagsMap);
 
 		return repository;
